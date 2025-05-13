@@ -15,6 +15,21 @@ class OrderResponse(BaseModel):
     total_days: int
     total_rent: int
     rent_per_day: int
+    # student_id: int                 
+    # book_id: int                 
+    student: StudentResponse
+    book: BookResponse
+
+    class Config:
+        from_attributes = True
+
+
+    
+class OrderUpdate(BaseModel):
+    student_id: Optional[int] = None
+    book_id: Optional[int] = None
+    return_date: Optional[date] = None
+
 
     student: StudentResponse
     book: BookResponse

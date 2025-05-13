@@ -13,7 +13,7 @@ Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/books", tags=["books"])
 
-# -------- Utility: Save Cover Image and Return Filename -------- #
+
 def save_cover_image(file: UploadFile) -> str:
     allowed_exts = [".jpg", ".jpeg", ".png"]
     ext = os.path.splitext(file.filename)[1].lower()
@@ -27,9 +27,9 @@ def save_cover_image(file: UploadFile) -> str:
     with open(path, "wb") as f:
         f.write(file.file.read())
 
-    return filename  # return only filename, not full path
+    return filename  
 
-# -------- Create Book -------- #
+
 @router.post("/", response_model=BookResponse, status_code=201)
 async def create_book(
     request: Request,
@@ -56,7 +56,7 @@ async def create_book(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# -------- List Books -------- #
+
 @router.get("/", response_model=list[BookResponse])
 def list_books(request: Request):
     books = Book.select()
@@ -73,7 +73,7 @@ def list_books(request: Request):
 
     return result
 
-# -------- Get Book by ID -------- #
+
 @router.get("/{book_id}", response_model=BookResponse)
 def get_book(book_id: int, request: Request):
     try:
@@ -88,7 +88,7 @@ def get_book(book_id: int, request: Request):
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Book not found")
 
-# -------- Update Book -------- #
+
 @router.put("/{book_id}", response_model=BookResponse)
 async def update_book(
     request: Request,
@@ -111,13 +111,13 @@ async def update_book(
         if book_update.author:
             book.author = book_update.author
         if cover_image:
-            # Delete old image if new one is uploaded
+            
             if book.cover_image:
                 old_path = os.path.join(UPLOAD_FOLDER, book.cover_image)
                 if os.path.exists(old_path):
                     os.remove(old_path)
 
-            # Save new image
+            
             book.cover_image = save_cover_image(cover_image)
 
         book.save()
@@ -134,7 +134,7 @@ async def update_book(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
 
-# -------- Delete Book -------- #
+
 @router.delete("/{book_id}", status_code=status.HTTP_200_OK)
 def delete_book(book_id: int):
     try:
@@ -143,7 +143,7 @@ def delete_book(book_id: int):
         if Order.select().where((Order.book == book) & (Order.return_date.is_null())).exists():
             raise HTTPException(status_code=400, detail="Cannot delete book that is currently rented")
 
-        # Delete cover image from the disk
+        
         if book.cover_image:
             path = os.path.join(UPLOAD_FOLDER, book.cover_image)
             if os.path.exists(path):
@@ -157,7 +157,7 @@ def delete_book(book_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting book: {str(e)}")
 
-# -------- Serve Cover Image -------- #
+
 @router.get("/cover/{filename}")
 def get_cover_image(filename: str):
     file_path = os.path.join(UPLOAD_FOLDER, filename)

@@ -13,7 +13,7 @@ Path(UPLOAD_FOLDER).mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(prefix="/students", tags=["students"])
 
-# 🔹 Save photo
+
 def save_student_photo(file: UploadFile) -> str:
     ext = os.path.splitext(file.filename)[1]
     filename = f"{uuid.uuid4().hex}{ext}"
@@ -22,7 +22,7 @@ def save_student_photo(file: UploadFile) -> str:
         f.write(file.file.read())
     return filename
 
-# 🔸 Create Student
+
 @router.post("/", response_model=StudentResponse, status_code=201)
 async def create_student(
     request: Request,
@@ -47,7 +47,7 @@ async def create_student(
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# 🔸 List Students
+
 @router.get("/", response_model=list[StudentResponse])
 def list_students(request: Request):
     students = Student.select()
@@ -62,7 +62,7 @@ def list_students(request: Request):
         ))
     return result
 
-# 🔸 Get Student by ID
+
 @router.get("/{student_id}", response_model=StudentResponse)
 def get_student(student_id: int, request: Request):
     try:
@@ -77,7 +77,7 @@ def get_student(student_id: int, request: Request):
     except DoesNotExist:
         raise HTTPException(status_code=404, detail="Student not found")
 
-# 🔸 Update Student
+
 @router.put("/{student_id}", response_model=StudentResponse)
 async def update_student(
     request: Request,
@@ -116,7 +116,7 @@ async def update_student(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error: {str(e)}")
 
-# 🔸 Delete Student
+
 @router.delete("/{student_id}")
 def delete_student(student_id: int):
     try:
@@ -138,7 +138,7 @@ def delete_student(student_id: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error deleting student: {str(e)}")
 
-# 🔸 Serve student photo
+
 @router.get("/photo/{filename}")
 def get_student_photo(filename: str):
     path = os.path.join(UPLOAD_FOLDER, filename)
