@@ -15,8 +15,8 @@ class OrderResponse(BaseModel):
     total_days: int
     total_rent: int
     rent_per_day: int
-    # student_id: int                 
-    # book_id: int                 
+    student_id: int                 
+    book_id: int                 
     student: StudentResponse
     book: BookResponse
 
